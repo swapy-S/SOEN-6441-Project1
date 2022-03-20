@@ -82,5 +82,15 @@ public class SearchController extends Controller {
         return res.thenApplyAsync(o -> ok(views.html.profileInformation.render(o)));
     }
 
+    public CompletionStage<Result> globalStats(String keyword){  
+//      Map<String,Integer> stats;
+//        stats = freelancer.getGlobalStats(keyword);
+//        return CompletableFuture.completedFuture(
+//                ok(views.html.globalStats.render(freelancer.getGlobalStats(keyword))));
+        CompletionStage<GlobalStats> res = freelancer.getGlobalStats(keyword);
+        return res.thenApplyAsync(o -> ok(views.html.globalStats.render(o)));
+    
+    }
+
 
 }
