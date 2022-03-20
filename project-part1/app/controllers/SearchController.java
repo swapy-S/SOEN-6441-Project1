@@ -9,6 +9,7 @@ import models.SearchHistory;
 import models.SearchResult;
 import models.SearchProfile;
 import models.ProfileInformation;
+import models.GlobalStats;
 import play.api.cache.AsyncCacheApi;
 import play.api.data.Form;
 import play.i18n.MessagesApi;
