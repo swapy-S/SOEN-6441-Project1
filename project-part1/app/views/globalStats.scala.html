@@ -1,0 +1,13 @@
+@import models.GlobalStats
+@(stats: GlobalStats)
+
+
+@main("FreeLancelot") {
+
+        <article class="text-center" style="margin-top:50px;">
+            <div>
+                <p>@stats.getSortedWordCounter</p>
+            </div>
+        </article>
+
+}
