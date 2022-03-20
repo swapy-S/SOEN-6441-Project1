@@ -167,6 +167,57 @@ public class FreelancerClient {
 
 
     }
+    public CompletionStage<SearchResult> projectsIncludingSkill(String id, String skill){
+        return cache.getOrElseUpdate("search://"+skill,()->{
+            WSRequest req = client.url(baseURL+"/projects/0.1/projects/active");
+//          System.out.println(Json.fromJson((req.addQueryParameter("query", freelancerQuery).get()).asJson(), SearchResult.class));
+            return req
+                    .addHeader("freelancelotESAPP","UzhSBUrlZiSK4o8yQ8CA8ZyJ36VRvh")
+                    .addQueryParameter("jobs[]",id)
+                    .addQueryParameter("compact","false")
+                    .addQueryParameter("job_details","true")
+                    .addQueryParameter("limit","10")
+                    .get()
+                    .thenApplyAsync(WSResponse::asJson)
+                    .thenApplyAsync(r-> {
+                        ArrayList<Projects> projectsList = new ArrayList<>();
+                        int f = 0;
+                        while (r.get("result").get("projects").get(f) != null) {
+                            Projects project = new Projects();
+                            JsonNode  skills = r.get("result").get("projects").get(f).get("jobs");;
+                            HashMap<String,Integer> skillsData = new HashMap<>();
+                            for(int i = 0 ; i<skills.size() ; i++){
+                                int id1 = skills.get(i).get("id").asInt();
+                                String skillName = skills.get(i).get("name").asText();
+                                if(skillsData.containsKey(id)){
+                                    continue;
+                                }
+                                else{
+                                    skillsData.put(skillName,id1);
+                                }
+
+                            }
+                            project.setSkills(skillsData);
+                            project.setOwner(r.get("result").get("projects").get(f).get("owner_id").asText());
+                            project.setTitle(r.get("result").get("projects").get(f).get("title").asText());
+                            project.setType(r.get("result").get("projects").get(f).get("type").asText());
+                            project.setPrevDesc(r.get("result").get("projects").get(f).get("preview_description").asText());
+
+                            Date date = new Date(r.get("result").get("projects").get(f).get("submitdate").asLong() * 1_000L);
+                            DateFormat simple = new SimpleDateFormat("MMM dd yyyy");
+                            project.setDate(simple.format(date));
+                            project.setSeo_url(r.get("result").get("projects").get(f).get("seo_url").asText());
+                            project.setType(r.get("result").get("projects").get(f).get("type").asText());
+                            projectsList.add(project);
+                            f++;
+                        }
+                        SearchResult searchResult = new SearchResult();
+                        searchResult.setInput(skill);
+                        searchResult.setProjects(projectsList);
+                        return searchResult;
+                       } );
+                    },4000);    
+                    }
     
     public CompletionStage<GlobalStats> getGlobalStats(String searchkeyword){
             WSRequest req = client.url(baseURL+"/projects/0.1/projects/active");

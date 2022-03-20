@@ -10,3 +10,4 @@ GET     /search                     controllers.SearchController.search(request:
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
 GET     /profile/:ownerid           controllers.SearchController.profileInfo(ownerid: String)
 GET 	/globalStats				controllers.SearchController.globalStats(keyword: String)
+GET     /projectsIncludingSkill		controllers.SearchController.projectsIncludingSkill(id:Int, skill: String)
