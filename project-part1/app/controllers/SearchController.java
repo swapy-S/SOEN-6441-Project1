@@ -2,16 +2,16 @@ package controllers;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
-
-import com.google.inject.Inject;
-
+import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import models.FreelancerClient;
 import models.SearchHistory;
 import models.SearchResult;
-
-import play.i18n.MessagesApi;
-import play.api.data.Form;
+import models.SearchProfile;
+import models.ProfileInformation;
 import play.api.cache.AsyncCacheApi;
+import play.api.data.Form;
+import play.i18n.MessagesApi;
 import play.data.FormFactory;
 import play.mvc.*;
 import java.util.Map;
@@ -34,7 +34,6 @@ public class SearchController extends Controller {
 
         private AsyncCacheApi cache;
 
-        @Inject
         public SearchController(FreelancerClient freelancer, FormFactory formFactory, MessagesApi messagesApi, AsyncCacheApi asyncCacheApi) {
             this.freelancer = freelancer;
             this.searchForm = formFactory.form(SearchForm.class);
@@ -76,6 +75,11 @@ public class SearchController extends Controller {
             }
             return CompletableFuture.completedFuture(redirect(routes.SearchController.index()));
         }
+    }
+
+    public CompletionStage<Result> profileInfo(String  ownerId) throws JsonGenerationException, JsonMappingException{
+        CompletionStage<List<SearchProfile>> res = freelancer.getOwnerProfile(ownerId);
+        return res.thenApplyAsync(o -> ok(views.html.profileInformation.render(o)));
     }
 
 
