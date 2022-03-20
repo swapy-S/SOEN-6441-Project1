@@ -96,5 +96,11 @@ public class SearchController extends Controller {
     
     }
 
+    public CompletionStage<Result> projectsIncludingSkill(int id, String skill){
+        Integer y = new Integer(id);
+        CompletionStage<SearchResult> answer = freelancer.projectsIncludingSkill(Integer.toString(y), skill);
+        return answer.thenApplyAsync(o -> ok(views.html.projectsWithSkills.render("Search term",o)));
+    }
+
 
 }

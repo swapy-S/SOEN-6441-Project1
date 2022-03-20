@@ -34,7 +34,7 @@
         <td>@prj.getType</td>
         <td>@for((key,value) <- prj.getSkills()){
             <ul>
-                @key
+               <a href="@routes.SearchController.projectsIncludingSkill(value, key)"> @key</a>            
             </ul>
             }</td>
 

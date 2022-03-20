@@ -1,0 +1,53 @@
+@import models.SearchResult 
+@(title: String, search: SearchResult)
+
+<div class="container">
+    <h4 class="h5" style="margin-left: 20px; margin-top:10px;"> @title: @search.getInput() </h4>
+</div>
+<head>
+        @* Here's where we render the page title `String`. *@
+        <title>@title</title>
+        <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/bootstrap.css")">
+        <link rel="shortcut icon" type="image/png" href="@routes.Assets.versioned("images/favicon.png")">
+    </head>
+<div class="container text-center">
+
+    @if(search.getProjects().isEmpty()) {
+        <p class="font-weight-bold"> No projects found...</p>
+
+    }else{
+        <table class="table table-striped">
+            <thead>
+                <th>Owner</th>
+                <th>Date</th>
+                <th>Title</th>
+                <th>Type</th>
+                <th>Skills</th>
+                <th>Stats</th>
+                <th>Readability</th>
+            </thead>
+            @for(prj <- search.getProjects()) {
+
+                    <td> <a href="@routes.SearchController.profileInfo(prj.getOwner())">
+                    @prj.getOwner()
+                    </a ></td>
+                   <td>@prj.getDate</td>
+               		<td><a href="https://www.freelancer.com/projects/@prj.getSeo_url">@prj.getTitle</a></td>
+                    <td>@prj.getType</td>
+                    <td>
+                    @for((key,value) <- prj.getSkills()){
+                        <ul>
+                    	   <a href="@routes.SearchController.projectsIncludingSkill(value,key)"> @key</a>
+                        </ul>
+                    }
+                    </td>
+
+                    <td><a>Project Stats</a></td>
+                    <td>Readability</td>
+                </tr>
+            }
+
+        </table>
+    }
+
+</div>
