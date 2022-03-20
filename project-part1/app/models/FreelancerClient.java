@@ -99,7 +99,7 @@ public class FreelancerClient {
         }, 4000);
     }
 
-     public CompletionStage<List<SearchProfile>> getOwnerProfile (String owner_id) throws JsonGenerationException, JsonMappingException {
+    public CompletionStage<List<SearchProfile>> getOwnerProfile (String owner_id) throws JsonGenerationException, JsonMappingException {
         SearchProfile searchProfile = new SearchProfile();
         ProfileInformation profileInformation = new ProfileInformation();
         List<ProfileInformation> profile = new ArrayList<ProfileInformation>();
@@ -166,6 +166,46 @@ public class FreelancerClient {
 
 
     }
+    
+    public CompletionStage<GlobalStats> getGlobalStats(String searchkeyword){
+            WSRequest req = client.url(baseURL+"/projects/0.1/projects/active");
+            return req
+                    .addHeader("freelancelotESAPP","UzhSBUrlZiSK4o8yQ8CA8ZyJ36VRvh")
+                    .addQueryParameter("query",searchkeyword)
+                    .addQueryParameter("preview_description","true")
+                    .addQueryParameter("limit","250")
+                    .get()
+                    .thenApplyAsync(WSResponse::asJson)
+                    .thenApplyAsync(r-> {
+                        List<String> descriptionList = new ArrayList<>();
+                        int f = 0;
+                      while (r.get("result").get("projects").get(f) != null) {
+                          descriptionList.add(r.get("result").get("projects").get(f).get("preview_description").asText());
+                          f++;
+                      }
+                      String allwords ="";
+                      for (int i = 0; i < descriptionList.size(); i++) {
+                          allwords = allwords+ descriptionList.get(i);
+                      }
+                      List <String> words = Stream.of(allwords).
+                                map(a -> ((String) a)
+                                .replaceAll("[^a-zA-Z ]", "")
+                                .split("\\s+")).flatMap(Arrays::stream)
+                                .collect(Collectors.toList());
+                      
+                      Map <String, Integer> wordCounter = words.stream()
+                              .collect(Collectors.toMap(w -> w.toLowerCase(), w -> 1, Integer::sum));
+                        
+                      GlobalStats globalstats = new GlobalStats();
+                      Map<String, Integer> temp = new LinkedHashMap<>();
+                      wordCounter.entrySet().stream()
+                              .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
+                              .forEachOrdered(x -> temp.put(x.getKey(), x.getValue()));
+                      globalstats.setSortedWordCounter(temp);
+                      return globalstats;
+            
+                    });
+        }
 
 }
 

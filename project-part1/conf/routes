@@ -9,3 +9,4 @@ GET     /search                     controllers.SearchController.search(request:
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
 GET     /profile/:ownerid           controllers.SearchController.profileInfo(ownerid: String)
+GET 	/globalStats				controllers.SearchController.globalStats(keyword: String)
