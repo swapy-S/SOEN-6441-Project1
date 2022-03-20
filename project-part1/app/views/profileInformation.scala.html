@@ -1,0 +1,87 @@
+@import models.ProfileInformation
+@import models.SearchProfile
+@import models.ProjectProfile
+@(searchProfile: List[SearchProfile])
+@main("FreeLancelot") {
+
+    <div class="text-center container">
+        @if(searchProfile != null) {
+            @for(owner <- searchProfile) {
+                @for(det <- owner.getProfileInformation()) {
+                    <div class="text-center mb-3">
+                        <h3> Deatils of:</h3>
+                        <h2> @det.getPublicName()</h2>
+                    </div>
+                    <table class="table table-striped">
+                        <tr>
+                            <th style="background-color: black; color: white">Details Name</th>
+                            <th style="background-color: black; color: white">Details Value</th>
+                        </tr>
+
+                        <tr>
+                            <th>Owner_id</th>
+                            <td>@det.getOwner_id()</td>
+                        </tr>
+                        <tr>
+                            <th>Username</th>
+                            <td>@det.getUsername()</td>
+
+                        </tr>
+                        <tr>
+                            <th>Registration_Date</th>
+                            <td>@det.getRegistration_date()</td>
+                        </tr>
+                        <tr>
+                            <th>Limited_Account</th>
+                            <td>@det.getLimited_account()</td>
+                        </tr>
+                        <tr>
+                            <th>Display_Name</th>
+                            <td>@det.getDisplay_name()</td>
+                        </tr>
+                        <tr>
+                            <th>Country</th>
+                            <td>@det.getCountry()</td>
+                        </tr>
+                        <tr>
+                            <th>Role</th>
+                            <td>@det.getRole()</td>
+                        </tr>
+                        <tr>
+                            <th>Email_Status</th>
+                            <td>@det.getEmail_status()</td>
+                        </tr>
+                        <tr>
+                            <th>Accepted_Currency</th>
+                            <td>@det.getAccepted_currency()</td>
+                        </tr>
+                        <tr>
+                            <th>Projects</th>
+                            <td>
+                                <table class="ml-5" style="margin-right: -20px;">
+                                    <tr>
+                                        <th>Id</th>
+                                        <th>Title</th>
+                                        <th>Date</th>
+                                        <th>Description</th>
+                                    </tr>
+                                    @for(prjts <- det.getProjectProfile()) {
+                                        <tr>
+                                            <td>@prjts.getPortfolioid()</td>
+                                            <td>@prjts.getTitle()</td>
+                                            <td>@prjts.getLastmodifydate()</td>
+                                            <td>@prjts.getDescription()</td>
+                                        </tr>
+                                    }
+                                </table>
+                            </td>
+                        </tr>
+
+                    </table>
+
+
+                }
+            }
+        }
+    </div>
+}

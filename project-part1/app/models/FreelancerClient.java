@@ -15,9 +15,6 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
-//import org.fasterxml.jackson.annotate.JsonAutoDetect.Visibility;
-//import org.fasterxml.jackson.annotate.JsonMethod;
-import com.google.inject.Inject;
 import com.typesafe.config.Config;
 import java.text.SimpleDateFormat;
 import java.text.DateFormat;
@@ -39,7 +36,7 @@ public class FreelancerClient {
 
     private final AsyncCacheApi cache;
 
-    @Inject
+    
     public FreelancerClient(WSClient client, AsyncCacheApi cache, Config config) {
         this.client = client;
         this.cache = cache;
@@ -100,6 +97,74 @@ public class FreelancerClient {
                         return searchResult;
                     });
         }, 4000);
+    }
+
+     public CompletionStage<List<SearchProfile>> getOwnerProfile (String owner_id) throws JsonGenerationException, JsonMappingException {
+        SearchProfile searchProfile = new SearchProfile();
+        ProfileInformation profileInformation = new ProfileInformation();
+        List<ProfileInformation> profile = new ArrayList<ProfileInformation>();
+        List<SearchProfile> liSearch = new ArrayList<SearchProfile>();
+        return  cache.getOrElseUpdate("search://" + owner_id,() -> {
+            WSRequest req = client.url(baseURL+"/users/0.1/portfolios/?limit=10&compact=true&portfolio_details=true&user_details=true&user_qualification_details=true&user_jobs=true&user_portfolio_details=true&user_recommendations=true&count=true&user_profile_description=true&users[]="+owner_id);
+            return req
+                    .addHeader("freelancelotESAPP","UzhSBUrlZiSK4o8yQ8CA8ZyJ36VRvh")
+                    .addQueryParameter("limit","10")
+                    .get()
+                    .thenApplyAsync(WSResponse::asJson)
+                    .thenApplyAsync(r-> {
+                        profileInformation.setUsername(r.get("result").get("users").get(owner_id).get("username").asText());
+                        profileInformation.setPublicName(r.get("result").get("users").get(owner_id).get("public_name").asText());
+                        profileInformation.setOwner_id(r.get("result").get("users").get(owner_id).get("id").asText());
+                        profileInformation.setRegistration_date(r.get("result").get("users").get(owner_id).get("registration_date").asText());
+                        profileInformation.setLimited_account(r.get("result").get("users").get(owner_id).get("limited_account").asText());
+                        profileInformation.setDisplay_name(r.get("result").get("users").get(owner_id).get("display_name").asText());
+                        profileInformation.setCountry(r.get("result").get("users").get(owner_id).get("location").get("country").get("name").asText());
+                        profileInformation.setRole(r.get("result").get("users").get(owner_id).get("role").asText());
+                        profileInformation.setEmail_status(r.get("result").get("users").get(owner_id).get("status").get("email_verified").asText());
+                        profileInformation.setAccepted_currency(r.get("result").get("users").get(owner_id).get("primary_currency").get("name").asText());
+                        JsonNode  portfolios = r.get("result").get("portfolios").get(owner_id);
+                        if(portfolios == null){
+                            List<ProjectProfile> pinfoList = new ArrayList<ProjectProfile>();
+                            ProjectProfile pp = new ProjectProfile();
+                            pp.setTitle("No Title");
+                            pp.setDescription("No Description");
+                            Date date = new Date(0000000000 *1_000L);
+                            DateFormat simple = new SimpleDateFormat("dd MMM yyyy");
+                            pp.setLastmodifydate(simple.format(date));
+                            pp.setPortfolioid("No ID");
+                            pinfoList.add(pp);
+                            profileInformation.setProjectProfile(pinfoList);
+                            profile.add(profileInformation);
+                            searchProfile.setProfileInformation(profile);
+                            liSearch.add(searchProfile);
+                            return liSearch;
+
+                        }
+                        else{
+                            List<ProjectProfile> pinfoList = new ArrayList<ProjectProfile>();
+                            for (int i = 0; i < portfolios.size(); i++) {
+                                ProjectProfile pp = null;
+                                pp = new ProjectProfile();
+                                pp.setTitle(portfolios.get(i).get("title").asText());
+                                pp.setDescription(portfolios.get(i).get("description").asText());
+                                Date date = new Date(portfolios.get(i).get("last_modify_date").asLong() * 1_000L);
+                                DateFormat simple = new SimpleDateFormat("dd MMM yyyy");
+                                pp.setLastmodifydate(simple.format(date));
+                                pp.setPortfolioid(portfolios.get(i).get("id").toString());
+                                pinfoList.add(pp);
+                            }
+                            profileInformation.setProjectProfile(pinfoList);
+                            profile.add(profileInformation);
+                            searchProfile.setProfileInformation(profile);
+                            liSearch.add(searchProfile);
+                            return liSearch;
+                        }
+//                        System.out.println(portfolios.asText());
+
+                    } );
+        },4000);
+
+
     }
 
 }

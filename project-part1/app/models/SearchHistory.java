@@ -12,6 +12,7 @@ public class SearchHistory {
 
     /** a map from session_id to its search history */
     private final Map<String, List<SearchResult>> sessions = new HashMap<>();
+    private final Map<String, List<SearchProfile>> sessions_profile = new HashMap<>();
 
     /**
      * The method addToHistory, add the search result with its sessionId to the history
@@ -26,6 +27,17 @@ public class SearchHistory {
                 curr = new ArrayList<>(curr.subList(0, MAX_HISTORY - 1));
             }
             curr.add(0, result);
+            return curr;
+        });
+    }
+    public synchronized void addToHistoryPro(String sessionId, SearchProfile searchProfile) {
+        sessions_profile.compute(sessionId, (k, curr) -> {
+            if (curr == null) {
+                curr = new ArrayList<>();
+            } else if (curr.size() >= MAX_HISTORY) {
+                curr = new ArrayList<>(curr.subList(0, MAX_HISTORY - 1));
+            }
+            curr.add(0, searchProfile);
             return curr;
         });
     }
