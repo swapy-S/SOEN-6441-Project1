@@ -5,6 +5,7 @@ import java.util.concurrent.CompletionStage;
 
 import com.google.gson.*;
 import play.libs.Json;
+import com.google.inject.Inject;
 
 import play.libs.ws.WSBodyReadables.*;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -36,7 +37,7 @@ public class FreelancerClient {
 
     private final AsyncCacheApi cache;
 
-    
+    @Inject
     public FreelancerClient(WSClient client, AsyncCacheApi cache, Config config) {
         this.client = client;
         this.cache = cache;

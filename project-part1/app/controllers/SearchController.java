@@ -1,5 +1,7 @@
 package controllers;
 
+import com.google.inject.Inject;
+
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import com.fasterxml.jackson.core.JsonGenerationException;
@@ -35,6 +37,7 @@ public class SearchController extends Controller {
 
         private AsyncCacheApi cache;
 
+        @Inject
         public SearchController(FreelancerClient freelancer, FormFactory formFactory, MessagesApi messagesApi, AsyncCacheApi asyncCacheApi) {
             this.freelancer = freelancer;
             this.searchForm = formFactory.form(SearchForm.class);
