@@ -4,6 +4,11 @@
     <h4 class="h5" style="margin-left: 20px; margin-top:10px;"> @title: @search.getInput() </h4>
 </div>
 <div class="container text-center">
+    <h4 class="h5" style="margin-left: 20px; margin-top:10px; "> 
+    <a href="@routes.SearchController.globalStats(search.getInput)"> Global Stats</a>
+    </h4>
+</div>
+<div class="container text-center">
 
     @if(search.getProjects().isEmpty()) {
     <p class="font-weight-bold"> No projects found...</p>
@@ -21,7 +26,7 @@
         </thead>
         @for(prj <- search.getProjects()) {
 
-        <td> <a >
+        <td> <a href="@routes.SearchController.profileInfo(prj.getOwner)">
             @prj.getOwner()
         </a></td>
         <td>@prj.getDate</td>
